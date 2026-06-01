@@ -16,6 +16,11 @@ import { updateStrategyCache } from "../core/strategyCache";
 const PARTICIPANT_ID = "copilot-optimizer.chat";
 const FEEDBACK_COMMAND = "copilot-optimizer.chatFeedback";
 
+/** How strongly the automatic response score influences learning, relative to
+ *  an explicit user click. 0 = ignore auto-score, 1 = treat it like a click.
+ *  Kept < 1 so a real button press always carries more weight. */
+const SOFT_SCORE_WEIGHT = 0.5;
+
 /** Slash commands that force a particular intent by prefixing the prompt. */
 const INTENT_COMMANDS = new Set([
   "debug",
@@ -97,7 +102,8 @@ export function registerChatParticipant(context: vscode.ExtensionContext): void 
         args.strategy as "minimal" | "moderate" | "aggressive",
         trueScore,
         args.contextNodeNames,
-        args.intent
+        args.intent,
+        true // authoritative — an explicit click overrides the soft auto-score
       );
       logFeedback(
         args.prompt,
@@ -233,13 +239,17 @@ async function handleChat(
     const intent = result.intent.intent;
     const quality = scoreResponse(answer, userText, intent);
 
-    // Zero-click learning: nudge the strategy cache with the real response score.
+    // Soft (zero-click) signal: dampen the heuristic auto-score toward neutral so
+    // it nudges learning but never locks in a value a human click can't correct.
+    // An explicit button click (authoritative) always overrides this.
+    const softScore = 0.5 + (quality.total - 0.5) * SOFT_SCORE_WEIGHT;
     updateStrategyCache(
       result.cacheKey,
       result.optimized.strategy as "minimal" | "moderate" | "aggressive",
-      quality.total,
+      softScore,
       result.ranked.map((r) => r.node.name),
-      intent
+      intent,
+      false // soft — not authoritative
     );
 
     const g = GRADE_EMOJI[quality.grade] ?? "⚪";

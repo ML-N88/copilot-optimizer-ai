@@ -26,6 +26,9 @@ interface CacheEntry {
   contextNodeNames: string[];
   /** Intent stored alongside node names */
   intent: string;
+  /** True when the score came from an explicit user signal (button click).
+   *  Authoritative scores are never overwritten by soft auto-scores. */
+  authoritative?: boolean;
 }
 
 type CacheStore = Record<string, CacheEntry>;
@@ -155,11 +158,21 @@ export function updateStrategyCache(
   strategy: StrategyLabel,
   trueQualityScore: number,
   contextNodeNames: string[] = [],
-  intent = ""
+  intent = "",
+  authoritative = false
 ): void {
   const store = loadCache();
   const existing = store[key];
-  if (!existing || trueQualityScore > existing.bestScore) {
+
+  // A soft (auto-score) signal must never overwrite an explicit user signal.
+  if (!authoritative && existing?.authoritative) return;
+
+  // Authoritative signals always win (and may lower the score); soft signals
+  // keep the best score seen so far.
+  const shouldUpdate =
+    authoritative || !existing || trueQualityScore > existing.bestScore;
+
+  if (shouldUpdate) {
     store[key] = {
       strategy,
       bestScore: trueQualityScore,
@@ -167,6 +180,7 @@ export function updateStrategyCache(
       hits: existing?.hits ?? 0,
       contextNodeNames,
       intent,
+      authoritative: authoritative || existing?.authoritative,
     };
     saveCache(store);
   }
