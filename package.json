@@ -78,9 +78,12 @@
         "copilotOptimizer.model": {
           "type": "string",
           "default": "",
-          "enum": ["", "gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "claude-3.5-sonnet", "gemini-1.5-pro"],
+          "enum": ["", "claude-opus-4.8", "claude-sonnet-4.6", "gpt-5.5", "gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "claude-3.5-sonnet", "gemini-1.5-pro"],
           "enumItemLabels": [
             "Chat default (recommended)",
+            "Claude Opus 4.8",
+            "Claude Sonnet 4.6",
+            "GPT-5.5",
             "GPT-4o",
             "GPT-4o mini",
             "o1",
@@ -90,6 +93,9 @@
           ],
           "enumDescriptions": [
             "Use whatever model is selected in the Copilot Chat dropdown.",
+            "Anthropic Claude Opus 4.8 — most capable.",
+            "Anthropic Claude Sonnet 4.6 — fast and strong.",
+            "OpenAI GPT-5.5.",
             "OpenAI GPT-4o.",
             "Smaller, faster GPT-4o.",
             "OpenAI o1 reasoning model.",

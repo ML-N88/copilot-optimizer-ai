@@ -10,7 +10,7 @@ export function createDashboard(
 ): vscode.WebviewPanel {
   const panel = vscode.window.createWebviewPanel(
     "copilotOptimizerDashboard",
-    "Copilot Optimizer v2",
+    "Copilot Optimizer",
     vscode.ViewColumn.One,
     { enableScripts: false, retainContextWhenHidden: true }
   );
@@ -56,40 +56,6 @@ function buildHtml(
         </tr>`
     )
     .join("");
-
-  const compTable = `
-    <table>
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>v1</th>
-          <th>v2</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Compression</td><td>✅</td><td>✅</td></tr>
-        <tr><td>Guardrails</td><td>✅</td><td>✅</td></tr>
-        <tr><td>Context Graph</td><td>✅</td><td>✅ (ranked + intent_match)</td></tr>
-        <tr><td>Intent Awareness</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Strategy Mapping</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Prompt Scorer</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Response Scorer</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Multi-strategy Refinement</td><td>❌</td><td>✅ (3 variants)</td></tr>
-        <tr><td>Token Budget Controller</td><td>❌</td><td>✅ (120 token cap)</td></tr>
-        <tr><td>Output Shaping</td><td>❌</td><td>✅ (format + max_lines)</td></tr>
-        <tr><td>Anti-fluff Constraints</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Feedback Loop</td><td>❌</td><td>✅</td></tr>
-        <tr><td>Learning Feedback Weights</td><td>❌</td><td>✅ (success_rate * 0.7)</td></tr>
-        <tr><td>Orthogonal Strategy Engine</td><td>❌</td><td>✅ v4 (4 dimensions)</td></tr>
-        <tr><td>Reasoning Mode Control</td><td>❌</td><td>✅ v4 (approach: trace / step-by-step / direct)</td></tr>
-        <tr><td>Implicit Feedback Scoring</td><td>❌</td><td>✅ v4 (true quality score)</td></tr>
-        <tr><td>Strategy Memory Cache</td><td>❌</td><td>✅ v5 (hash-keyed, cache hits)</td></tr>
-        <tr><td>Adaptive Context Graph</td><td>❌</td><td>✅ v5 (node weight learning)</td></tr>
-        <tr><td>Fuzzy Cache Matching</td><td>❌</td><td>✅ v6 (Jaccard ≥ 0.8)</td></tr>
-        <tr><td>Node Weight Decay</td><td>❌</td><td>✅ v6 (half-life 30d)</td></tr>
-        <tr><td>Confidence Scoring</td><td>❌</td><td>✅ v6 (score-range variance)</td></tr>
-      </tbody>
-    </table>`;
 
   const noData = stats.totalEntries === 0;
 
@@ -202,7 +168,7 @@ function buildHtml(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline';">
-  <title>Copilot Optimizer v2</title>
+  <title>Copilot Optimizer</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -363,7 +329,7 @@ function buildHtml(
   </style>
 </head>
 <body>
-  <h1>Copilot Optimizer <span class="badge">v6 — Adaptive LLM Execution Engine</span></h1>
+  <h1>Copilot Optimizer <span class="badge">v1.1.0 — Adaptive LLM Execution Engine</span></h1>
   <p class="subtitle">
     Intent-aware · Reasoning control · Orthogonal search · Fuzzy cache ·
     Node decay · <a href="#">confidence-aware adaptive learning</a>
@@ -395,13 +361,9 @@ function buildHtml(
       <div class="stat-value">${cacheStats.totalHits}</div>
       <div class="stat-label">Cache Hits</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-value">120</div>
-      <div class="stat-label">Token Budget Cap</div>
-    </div>
   </div>
 
-  <h2>Architecture <span class="tag">v2</span></h2>
+  <h2>Architecture</h2>
   <div class="arch">
     <div class="arch-row"><span class="arch-icon">📥</span><span class="arch-label">[1] Intent Engine — classify + confidence score</span></div>
     <div class="arch-row"><span class="arch-icon"></span><span class="arch-arrow">↓</span></div>
@@ -415,7 +377,7 @@ function buildHtml(
     <div class="arch-row"><span class="arch-icon"></span><span class="arch-arrow">↓</span></div>
     <div class="arch-row"><span class="arch-icon">⚡</span><span class="arch-label">[6] Token Optimizer — intent-aware compression</span></div>
     <div class="arch-row"><span class="arch-icon"></span><span class="arch-arrow">↓</span></div>
-    <div class="arch-row"><span class="arch-icon">💰</span><span class="arch-label">[7] Budget Controller — hard 120-token cap</span></div>
+    <div class="arch-row"><span class="arch-icon">💰</span><span class="arch-label">[7] Budget Controller — configurable token budget</span></div>
     <div class="arch-row"><span class="arch-icon"></span><span class="arch-arrow">↓</span></div>
     <div class="arch-row"><span class="arch-icon">🤖</span><span class="arch-label">Copilot API</span></div>
     <div class="arch-row"><span class="arch-icon"></span><span class="arch-arrow">↓</span></div>
@@ -455,9 +417,6 @@ function buildHtml(
 
   <h2>By Intent (feedback)</h2>
   ${intentSection}
-
-  <h2>v1 vs v2</h2>
-  ${compTable}
 
   <h2>Shortcuts</h2>
   <table>

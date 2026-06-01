@@ -30,10 +30,10 @@ without leaving the chat.
 
 | Setting | Default | What it does |
 |---------|---------|--------------|
-| `copilotOptimizer.tokenBudget` | `400` | Accuracy ↔ token-savings. Lower = more compression, higher = more context. |
+| `copilotOptimizer.tokenBudget` | `400` | Accuracy ↔ token-savings preset (Max savings · Balanced · Accuracy-first · Maximum accuracy). Lower = more compression, higher = more context. |
 | `copilotOptimizer.contextFiles` | `3` | How many top-ranked files to attach as real code. `0` = names only. |
 | `copilotOptimizer.contextCharBudget` | `6000` | Max characters of file content sent to the model. |
-| `copilotOptimizer.model` | `""` | Preferred Copilot model family (e.g. `gpt-4o`). Empty = chat default. |
+| `copilotOptimizer.model` | `""` | Preferred Copilot model (e.g. Claude Opus 4.8, GPT-5.5). Empty = use the model picked in the chat dropdown. |
 | `copilotOptimizer.enabled` | `true` | Master on/off for optimization. |
 
 ---
@@ -137,7 +137,7 @@ No prompts, no code, and no codebase context are sent anywhere except your confi
 - **Native `@optimizer` chat participant** — write naturally in Copilot Chat; it rewrites your prompt, sends it to the model, streams the answer, and auto-scores the response.
 - **Real file-content context** — injects the actual code of the most relevant workspace files (not just file names) for far more accurate answers.
 - **Slash commands** — `/debug` `/fix` `/refactor` `/explain` `/generate` `/raw` `/dashboard`.
-- **Settings** — token-budget slider, context file/character budgets, preferred model family, and a master on/off switch.
+- **Settings** — token-budget preset, context file/character budgets, preferred model, and a master on/off switch.
 - **Working on/off toggle** — the status-bar switch now actually enables/disables optimization.
 - **Fix** — learning data now persists in writable per-user global storage (previously failed silently when installed from the Marketplace).
 
