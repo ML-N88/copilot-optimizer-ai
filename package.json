@@ -2,7 +2,7 @@
   "name": "copilot-optimizer-ai",
   "displayName": "Copilot Optimizer AI",
   "description": "Get better Copilot answers automatically. Fix prompts. Improve answers. Learn over time.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "morten-ln",
   "icon": "images/icon.png",
   "repository": {
@@ -10,13 +10,67 @@
     "url": "https://github.com/ML-N88/copilot-optimizer-ai"
   },
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.90.0"
   },
-  "categories": ["AI", "Other", "Programming Languages"],
+  "categories": ["AI", "Chat", "Other", "Programming Languages"],
   "keywords": ["copilot", "github copilot", "prompt", "optimizer", "LLM", "AI", "productivity"],
   "activationEvents": ["onStartupFinished"],
   "main": "./out/vscode/extension.js",
   "contributes": {
+    "chatParticipants": [
+      {
+        "id": "copilot-optimizer.chat",
+        "name": "optimizer",
+        "fullName": "Copilot Optimizer AI",
+        "description": "Rewrites your prompt for accuracy, sends it to the model, and learns from the real response.",
+        "isSticky": true,
+        "commands": [
+          { "name": "debug", "description": "Optimize as a debugging prompt" },
+          { "name": "fix", "description": "Optimize as a fix prompt" },
+          { "name": "refactor", "description": "Optimize as a refactor prompt" },
+          { "name": "explain", "description": "Optimize as an explanation prompt" },
+          { "name": "generate", "description": "Optimize as a code-generation prompt" },
+          { "name": "raw", "description": "Bypass optimization \u2014 send your prompt unchanged (A/B compare)" },
+          { "name": "dashboard", "description": "Open the optimizer dashboard" }
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "Copilot Optimizer AI",
+      "properties": {
+        "copilotOptimizer.tokenBudget": {
+          "type": "number",
+          "default": 400,
+          "minimum": 60,
+          "maximum": 2000,
+          "markdownDescription": "Maximum tokens for the optimized prompt. **Lower** = more token savings (more aggressive compression). **Higher** = more accuracy (more context retained). Since the optimizer now talks to the model directly, an accuracy-first default is recommended."
+        },
+        "copilotOptimizer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Master on/off switch for prompt optimization in the `@optimizer` chat participant. When off, prompts are passed through unchanged. Can also be toggled from the status bar."
+        },
+        "copilotOptimizer.contextFiles": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "maximum": 10,
+          "markdownDescription": "How many of the top-ranked workspace files to read and attach (as real code, not just names) to the prompt sent to the model. Set to `0` to attach file names only."
+        },
+        "copilotOptimizer.contextCharBudget": {
+          "type": "number",
+          "default": 6000,
+          "minimum": 0,
+          "maximum": 40000,
+          "markdownDescription": "Maximum total characters of attached file content sent to the model. Larger = more code context (more accurate) but more tokens used."
+        },
+        "copilotOptimizer.model": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Preferred Copilot model family for `@optimizer` to send to (e.g. `gpt-4o`, `o1`, `claude-3.5-sonnet`). Leave empty to use the model selected in the chat dropdown, or the first available model. If the requested family isn't available, the optimizer falls back automatically."
+        }
+      }
+    },
     "commands": [
       {
         "command": "copilot-optimizer.optimize",
@@ -73,11 +127,13 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile"
+    "pretest": "npm run compile",
+    "package": "vsce package --out copilot-optimizer-ai.vsix"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.90.0",
     "@types/node": "^18.0.0",
+    "@vscode/vsce": "^2.24.0",
     "typescript": "^5.3.0"
   }
 }

@@ -9,3 +9,7 @@ tsconfig.json
 !node_modules
 node_modules/**
 !images/**
+data/logs.json
+data/node_weights.json
+data/strategy_cache.json
+**/*.vsix

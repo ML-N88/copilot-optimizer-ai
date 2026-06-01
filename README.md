@@ -7,6 +7,37 @@ A smart layer between you and GitHub Copilot that improves results automatically
 
 ---
 
+## 🆕 Native chat: `@optimizer`
+
+The fastest way to use it — talk to the optimizer **directly inside Copilot Chat**:
+
+```
+@optimizer fix the null pointer in UserService
+```
+
+You write naturally. Behind the scenes it rewrites your prompt, injects the real
+contents of the most relevant workspace files, sends it to the model, **streams the
+answer back**, and **automatically scores the response** so it keeps learning — all
+without leaving the chat.
+
+- **Slash commands:** `/debug` `/fix` `/refactor` `/explain` `/generate` `/raw` `/dashboard`
+- **`/raw`** bypasses optimization so you can A/B compare against a plain prompt.
+- **On/off:** toggle optimization from the status bar (bottom-right), or the
+  `copilotOptimizer.enabled` setting.
+- **Feedback buttons** (✓ / ✍ / ↩) under each answer refine the learning loop.
+
+### Settings
+
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `copilotOptimizer.tokenBudget` | `400` | Accuracy ↔ token-savings. Lower = more compression, higher = more context. |
+| `copilotOptimizer.contextFiles` | `3` | How many top-ranked files to attach as real code. `0` = names only. |
+| `copilotOptimizer.contextCharBudget` | `6000` | Max characters of file content sent to the model. |
+| `copilotOptimizer.model` | `""` | Preferred Copilot model family (e.g. `gpt-4o`). Empty = chat default. |
+| `copilotOptimizer.enabled` | `true` | Master on/off for optimization. |
+
+---
+
 ## Quick Start
 
 | Action | How |

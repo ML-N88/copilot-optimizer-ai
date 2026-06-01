@@ -10,6 +10,7 @@ import { applyBudget, getDefaultBudget } from "../core/budget";
 import { getStrategy, ReasoningMode } from "../core/strategy";
 import { buildCacheKey, lookupStrategyCacheFuzzy, updateStrategyCache } from "../core/strategyCache";
 import { createDashboard } from "./ui";
+import { registerChatParticipant } from "./chatParticipant";
 
 // ─── Release config ───────────────────────────────────────────────────────────
 // Flip to `false` during local development to enable 4-variant search + debug.
@@ -27,6 +28,14 @@ let autopilotEnabled = false;
 let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
 
+/** Whether prompt optimization is active (master on/off). Synced to the
+ *  `copilotOptimizer.enabled` setting and the status-bar toggle. */
+export function isOptimizerEnabled(): boolean {
+  return vscode.workspace
+    .getConfiguration("copilotOptimizer")
+    .get<boolean>("enabled", true);
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   outputChannel = vscode.window.createOutputChannel("Copilot Optimizer AI");
 
@@ -35,11 +44,27 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.StatusBarAlignment.Right,
     100
   );
-  statusBarItem.text = "$(zap) Optimizer: OFF";
-  statusBarItem.tooltip = "Copilot Optimizer AI — click to toggle autopilot";
   statusBarItem.command = "copilot-optimizer.toggleAutopilot";
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
+  refreshStatusBar();
+
+  // Keep the status bar in sync if the setting changes elsewhere.
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("copilotOptimizer.enabled")) refreshStatusBar();
+    })
+  );
+
+  // Register the @optimizer chat participant (native Copilot Chat integration).
+  // Guard so a missing/older chat API can never break the rest of the extension.
+  try {
+    registerChatParticipant(context);
+  } catch (err) {
+    outputChannel.appendLine(
+      `[Optimizer] Chat participant unavailable — legacy commands still work. ${String(err)}`
+    );
+  }
 
   // Build context graph on startup (fire-and-forget)
   buildGraph().then(() => {
@@ -81,7 +106,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
 // ─── Core pipeline ────────────────────────────────────────────────────────────
 
-interface PipelineResult {
+export interface PipelineResult {
   intent: ReturnType<typeof detectIntent>;
   compiled: ReturnType<typeof compilePrompt>;
   optimized: ReturnType<typeof optimizePrompt>;
@@ -178,7 +203,7 @@ function buildPipelineCore(
   return { intent, compiled, optimized, withContext: finalPrompt, ranked, budgetResult, promptScore };
 }
 
-function runPipeline(
+export function runPipeline(
   prompt: string,
   currentFile?: string,
   forceStrategy?: "minimal" | "moderate" | "aggressive"
@@ -407,19 +432,33 @@ async function runResponseScorer(): Promise<void> {
 }
 
 function toggleAutopilot(): void {
-  autopilotEnabled = !autopilotEnabled;
-  statusBarItem.text = autopilotEnabled
-    ? "$(zap) Optimizer: ON"
-    : "$(zap) Optimizer: OFF";
-  statusBarItem.backgroundColor = autopilotEnabled
-    ? new vscode.ThemeColor("statusBarItem.warningBackground")
-    : undefined;
-  vscode.window.showInformationMessage(
-    `Copilot Optimizer Autopilot: ${autopilotEnabled ? "ON" : "OFF"}`
-  );
+  const enabled = !isOptimizerEnabled();
+  // Persist to the setting so the chat participant and status bar agree.
+  vscode.workspace
+    .getConfiguration("copilotOptimizer")
+    .update("enabled", enabled, vscode.ConfigurationTarget.Global)
+    .then(() => {
+      refreshStatusBar();
+      vscode.window.showInformationMessage(
+        `Copilot Optimizer: ${enabled ? "ON" : "OFF"}`
+      );
+    });
 }
 
-function showDashboard(context: vscode.ExtensionContext): void {
+/** Sync the status-bar item to the current optimizer on/off state. */
+function refreshStatusBar(): void {
+  if (!statusBarItem) return;
+  const enabled = isOptimizerEnabled();
+  statusBarItem.text = enabled ? "$(zap) Optimizer: ON" : "$(circle-slash) Optimizer: OFF";
+  statusBarItem.tooltip = "Copilot Optimizer AI — click to toggle prompt optimization";
+  statusBarItem.backgroundColor = enabled
+    ? undefined
+    : new vscode.ThemeColor("statusBarItem.warningBackground");
+  // Keep the legacy flag mirrored for any remaining references.
+  autopilotEnabled = enabled;
+}
+
+export function showDashboard(context: vscode.ExtensionContext): void {
   const stats = getStats();
   createDashboard(context, stats);
 }

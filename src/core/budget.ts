@@ -82,5 +82,17 @@ export function applyBudget(
 }
 
 export function getDefaultBudget(): number {
+  // Read the user-configured token budget (accuracy <-> savings slider).
+  // Falls back to 120 when the VS Code API is unavailable (e.g. unit context).
+  try {
+    // Lazy require so this module stays usable outside the extension host.
+    const vscode = require("vscode") as typeof import("vscode");
+    const configured = vscode.workspace
+      .getConfiguration("copilotOptimizer")
+      .get<number>("tokenBudget");
+    if (typeof configured === "number" && configured >= 60) return configured;
+  } catch {
+    /* not running inside the extension host — use the default below */
+  }
   return 120;
 }
