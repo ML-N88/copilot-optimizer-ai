@@ -41,8 +41,19 @@
         "copilotOptimizer.tokenBudget": {
           "type": "number",
           "default": 400,
-          "minimum": 60,
-          "maximum": 2000,
+          "enum": [120, 250, 400, 800],
+          "enumItemLabels": [
+            "Max savings (120)",
+            "Balanced (250)",
+            "Accuracy-first (400)",
+            "Maximum accuracy (800)"
+          ],
+          "enumDescriptions": [
+            "Aggressive compression \u2014 smallest prompts, lowest token use.",
+            "Moderate compression \u2014 a balance of savings and context.",
+            "Light compression \u2014 keeps more context for better answers (recommended).",
+            "Minimal compression \u2014 maximum context retained, highest token use."
+          ],
           "markdownDescription": "Maximum tokens for the optimized prompt. **Lower** = more token savings (more aggressive compression). **Higher** = more accuracy (more context retained). Since the optimizer now talks to the model directly, an accuracy-first default is recommended."
         },
         "copilotOptimizer.enabled": {
@@ -67,7 +78,26 @@
         "copilotOptimizer.model": {
           "type": "string",
           "default": "",
-          "markdownDescription": "Preferred Copilot model family for `@optimizer` to send to (e.g. `gpt-4o`, `o1`, `claude-3.5-sonnet`). Leave empty to use the model selected in the chat dropdown, or the first available model. If the requested family isn't available, the optimizer falls back automatically."
+          "enum": ["", "gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "claude-3.5-sonnet", "gemini-1.5-pro"],
+          "enumItemLabels": [
+            "Chat default (recommended)",
+            "GPT-4o",
+            "GPT-4o mini",
+            "o1",
+            "o1-mini",
+            "Claude 3.5 Sonnet",
+            "Gemini 1.5 Pro"
+          ],
+          "enumDescriptions": [
+            "Use whatever model is selected in the Copilot Chat dropdown.",
+            "OpenAI GPT-4o.",
+            "Smaller, faster GPT-4o.",
+            "OpenAI o1 reasoning model.",
+            "Smaller o1 reasoning model.",
+            "Anthropic Claude 3.5 Sonnet.",
+            "Google Gemini 1.5 Pro."
+          ],
+          "markdownDescription": "Preferred Copilot model family for `@optimizer` to send to. Choose **Chat default** to use the model picked in the chat dropdown. If the selected model isn't available to your account, the optimizer falls back automatically."
         }
       }
     },
