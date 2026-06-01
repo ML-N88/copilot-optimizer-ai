@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import * as path from "path";
+import * as fs from "fs";
 import { detectIntent } from "../core/intent";
 import { compilePrompt } from "../core/compiler";
 import { optimizePrompt } from "../core/optimizer";
@@ -11,6 +13,7 @@ import { getStrategy, ReasoningMode } from "../core/strategy";
 import { buildCacheKey, lookupStrategyCacheFuzzy, updateStrategyCache } from "../core/strategyCache";
 import { createDashboard } from "./ui";
 import { registerChatParticipant } from "./chatParticipant";
+import { setStorageDir } from "../core/storage";
 
 // ─── Release config ───────────────────────────────────────────────────────────
 // Flip to `false` during local development to enable 4-variant search + debug.
@@ -38,6 +41,12 @@ export function isOptimizerEnabled(): boolean {
 
 export function activate(context: vscode.ExtensionContext): void {
   outputChannel = vscode.window.createOutputChannel("Copilot Optimizer AI");
+
+  // Route writable learning data to a per-user, writable location.
+  // The bundled install folder is read-only when installed from the Marketplace,
+  // so writing there silently fails and learning never persists.
+  setStorageDir(context.globalStorageUri.fsPath);
+  migrateLegacyData(context);
 
   // Status bar toggle
   statusBarItem = vscode.window.createStatusBarItem(
@@ -464,4 +473,31 @@ export function showDashboard(context: vscode.ExtensionContext): void {
 }
 export function deactivate(): void {
   outputChannel?.dispose();
+}
+
+/**
+ * One-time migration: copy any learning data that previously lived in the
+ * bundled `data/` folder into the new writable global-storage location so
+ * existing users keep their accumulated learning. Never overwrites newer data.
+ */
+function migrateLegacyData(context: vscode.ExtensionContext): void {
+  const files = ["logs.json", "node_weights.json", "strategy_cache.json"];
+  const legacyDir = path.join(context.extensionPath, "data");
+  const targetDir = context.globalStorageUri.fsPath;
+  try {
+    fs.mkdirSync(targetDir, { recursive: true });
+  } catch {
+    return;
+  }
+  for (const f of files) {
+    const src = path.join(legacyDir, f);
+    const dest = path.join(targetDir, f);
+    try {
+      if (fs.existsSync(src) && !fs.existsSync(dest)) {
+        fs.copyFileSync(src, dest);
+      }
+    } catch {
+      /* best-effort migration — ignore failures */
+    }
+  }
 }

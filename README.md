@@ -126,11 +126,20 @@ No prompts, no code, and no codebase context are sent anywhere except your confi
 
 - Zero telemetry
 - Zero external API calls
-- All learning data stored in the extension's local `data/` folder
+- All learning data stored in VS Code's per-user global storage on your machine
 
 ---
 
 ## Release Notes
+
+### 1.1.0
+
+- **Native `@optimizer` chat participant** — write naturally in Copilot Chat; it rewrites your prompt, sends it to the model, streams the answer, and auto-scores the response.
+- **Real file-content context** — injects the actual code of the most relevant workspace files (not just file names) for far more accurate answers.
+- **Slash commands** — `/debug` `/fix` `/refactor` `/explain` `/generate` `/raw` `/dashboard`.
+- **Settings** — token-budget slider, context file/character budgets, preferred model family, and a master on/off switch.
+- **Working on/off toggle** — the status-bar switch now actually enables/disables optimization.
+- **Fix** — learning data now persists in writable per-user global storage (previously failed silently when installed from the Marketplace).
 
 ### 1.0.0
 

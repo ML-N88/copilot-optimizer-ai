@@ -1,6 +1,6 @@
-import * as path from "path";
 import * as fs from "fs";
 import { updateNodeWeights } from "../context/nodeWeights";
+import { getStoragePath } from "./storage";
 
 // ─── Implicit signal ─────────────────────────────────────────────────────────
 
@@ -56,7 +56,7 @@ export interface FeedbackStats {
 }
 
 function getLogsPath(): string {
-  return path.join(__dirname, "..", "..", "data", "logs.json");
+  return getStoragePath("logs.json");
 }
 
 function generateId(): string {

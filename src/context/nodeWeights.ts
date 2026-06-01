@@ -21,8 +21,8 @@
  * help produce good responses.
  */
 
-import * as path from "path";
 import * as fs from "fs";
+import { getStoragePath } from "../core/storage";
 
 const LEARNING_RATE = 0.15;   // how fast weights shift per update
 const DEFAULT_WEIGHT = 0.5;   // neutral starting weight
@@ -41,7 +41,7 @@ type RawStore = Record<string, number | WeightEntry>;
 type WeightStore = Record<string, WeightEntry>;
 
 function getWeightsPath(): string {
-  return path.join(__dirname, "..", "..", "data", "node_weights.json");
+  return getStoragePath("node_weights.json");
 }
 
 function loadWeights(): WeightStore {

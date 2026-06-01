@@ -9,8 +9,8 @@
  * full 4-variant search.
  */
 
-import * as path from "path";
 import * as fs from "fs";
+import { getStoragePath } from "./storage";
 
 type StrategyLabel = "minimal" | "moderate" | "aggressive";
 
@@ -31,7 +31,7 @@ interface CacheEntry {
 type CacheStore = Record<string, CacheEntry>;
 
 function getCachePath(): string {
-  return path.join(__dirname, "..", "..", "data", "strategy_cache.json");
+  return getStoragePath("strategy_cache.json");
 }
 
 function loadCache(): CacheStore {
