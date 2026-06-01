@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.vsix
+*.js.map
+.vscode-test/
+
+# Data files with user-specific state (reset on install anyway)
+data/logs.json
+data/node_weights.json
+data/strategy_cache.json

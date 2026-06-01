@@ -1,0 +1,83 @@
+{
+  "name": "copilot-optimizer-ai",
+  "displayName": "Copilot Optimizer AI",
+  "description": "Get better Copilot answers automatically. Fix prompts. Improve answers. Learn over time.",
+  "version": "1.0.0",
+  "publisher": "morten-ln",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/copilot-optimizer/copilot-optimizer-ai"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["AI", "Other", "Programming Languages"],
+  "keywords": ["copilot", "github copilot", "prompt", "optimizer", "LLM", "AI", "productivity"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/vscode/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "copilot-optimizer.optimize",
+        "title": "Copilot Optimizer: Improve Prompt",
+        "icon": "$(zap)"
+      },
+      {
+        "command": "copilot-optimizer.quickSend",
+        "title": "Copilot Optimizer: Quick Send (optimize & copy)",
+        "icon": "$(send)"
+      },
+      {
+        "command": "copilot-optimizer.toggleAutopilot",
+        "title": "Copilot Optimizer: Toggle Autopilot"
+      },
+      {
+        "command": "copilot-optimizer.showFeedback",
+        "title": "Copilot Optimizer: Show Dashboard"
+      },
+      {
+        "command": "copilot-optimizer.rebuildGraph",
+        "title": "Copilot Optimizer: Rebuild Context Graph"
+      },
+      {
+        "command": "copilot-optimizer.scoreResponse",
+        "title": "Copilot Optimizer: Score Response"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "copilot-optimizer.optimize",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o",
+        "when": "editorFocus"
+      },
+      {
+        "command": "copilot-optimizer.quickSend",
+        "key": "ctrl+alt+enter",
+        "mac": "cmd+alt+enter",
+        "when": "editorFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "copilot-optimizer.quickSend",
+          "group": "copilot",
+          "when": "editorHasSelection"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.3.0"
+  }
+}
